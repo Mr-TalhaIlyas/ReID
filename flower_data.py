@@ -132,9 +132,32 @@ engine.run(
 
 # torchreid.utils.torchtools.save_checkpoint(state, save_dir='/home/user01/data/track/deep-person-reid/log/only_train_flower_osnet_x1_0', is_best=False, remove_module_from_keys=False)
 
+#%%
+import torch
+device = torch.device('cpu')
 
+model = models.build_model(name='osnet_x1_0',
+                           num_classes=datamanager.num_train_pids,
+                           loss='triplet') #softmax
+torchreid.utils.load_pretrained_weights(model, '/home/user01/data/track/deep-person-reid/log/only_train_flower_osnet_x1_0/model.pth.tar-64')
+model = model.to('cpu')
 
+example_input = torch.rand(1, 3, 128, 128).to(device)
+model.eval()
 
+with torch.no_grad():
+    traced_model = torch.jit.trace(model, example_input)
+
+torch.onnx.export(traced_model,               # TorchScript model
+                  example_input,               # Input tensor(s)
+                  '/home/user01/data/track/new_model.onnx',               # Output file
+                  export_params=True,         # Store the trained parameter weights inside the model file
+                  opset_version=11,           # The ONNX version to export the model to
+                  do_constant_folding=True,   # Whether to execute constant folding for optimization
+                  input_names=['input'],      # The model's input names
+                  output_names=['output'],    # The model's output names
+                  dynamic_axes={'input': {0: 'batch_size'},  # Variable length axes
+                                'output': {0: 'batch_size'}})
 
 
 
