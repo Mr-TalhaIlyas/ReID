@@ -1,3 +1,5 @@
+## Tips
+
 The error "all query identities do not appear in gallery" typically occurs when there is no overlap between the person identities (pids) in your query set and your gallery set. In other words, for each query image, there is no image in the gallery set from the same person but from a different camera view.
 
 In the code provided, the same dataset is used for the training, query, and gallery sets. However, in a real-world scenario, you would typically want to split your data into separate training, query, and gallery sets. 
